@@ -64,10 +64,10 @@ export default class Start extends Component {
     }
 
     render() {
-        if (this.state.isLoading == true) {
+        if (this.state.isLoading) {
             return (
-                <View style={{ flex: 1, justifyContent: 'center' }}>
-                    <ActivityIndicator size='large' color='black' />
+                <View style={{ flex: 1, justifyContent: 'center', backgroundColor: '#000000' }}>
+                    <ActivityIndicator size='large' color='#ffffff' />
                 </View>
             );
         }
@@ -75,7 +75,7 @@ export default class Start extends Component {
             <View style={[this.state.styles.backgroundScreen]}>
                 <View style={{ flex: 1 }}>
                     <Image
-                        style={{ height: 250, width: 'auto', marginTop: '20%' }}
+                        style={{ height: 200, width: 'auto', marginTop: '25%' }}
                         source={
                             require('./assets/images/Honkai-Star-Rail.png')
                         }

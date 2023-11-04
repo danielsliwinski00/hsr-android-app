@@ -1,7 +1,7 @@
 
 import React, { Component } from 'react';
 import {
-    ActivityIndicator, Text, TextInput, View,
+    ActivityIndicator, Text, View, Image, Animated, TouchableHighlight, FlatList, TextInput
 } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,6 +18,8 @@ export default class LogIn extends Component {
             isLoading: true,
             email: '',
             password: '',
+            emotes: [],
+            randomNum: Math.floor(Math.random() * 94) + 1,
         };
     }
 
@@ -28,8 +30,9 @@ export default class LogIn extends Component {
         })
 
         if (error) toast.show(error.message, { type: 'danger' })
-        else{
-    toast.show('successful login', {type: 'success'})}
+        else {
+            toast.show('successful login', { type: 'success' })
+        }
     }
 
     validate() {
@@ -74,30 +77,54 @@ export default class LogIn extends Component {
         this.setState({ password: text });
     };
 
+    async getData() {
+        const { data, error } = await supabase
+            .from('emotes')
+            .select('emote_path')
+        if (error) {
+            Toast.show(error.message, { type: 'danger' })
+        }
+        if (data) {
+            this.setState({ emotes: data}, ()=>{
+                this.setState({
+                    isLoading: false 
+                })
+            })
+        }
+    }
+
     async componentDidMount() {
+        await this.getData()
+    }
+    componentWillUnmount(){
         this.setState({
-            isLoading: false
+            isLoading: true
         })
     }
 
     render() {
-        if (this.state.isLoading == true) {
+        if (this.state.isLoading) {
             return (
-                <View style={{ flex: 1, justifyContent: 'center' }}>
-                    <ActivityIndicator size='large' color='black' />
+                <View style={{ flex: 1, justifyContent: 'center', backgroundColor: '#000000' }}>
+                    <ActivityIndicator size='large' color='#ffffff' />
                 </View>
             );
         }
         return (
             <View style={[this.state.styles.backgroundScreen]}>
-                <View style={{ flex: 1 }}>
+                <View style={{ flex: 2 }}>
+                    <Image
+                        style={{ height: 300, width: 300, marginTop: '25%', alignSelf:'center' }}
+                        source={{ uri: this.state.emotes[this.state.randomNum].emote_path}}
+                    />
                 </View>
-                <View style={{ flex: 1}}>
-                    <View style={{ paddingTop: '40%', justifyContent:'center' }}>
+                <View style={{ flex: 1 }}>
+                    <View style={{ justifyContent: 'center' }}>
                         <TextInput
                             style={[this.state.styles.loginTextInput]}
                             autoCapitalize="none"
                             placeholder="Email"
+                            placeholderTextColor={'grey'}
                             value={this.state.email}
                             onChangeText={this.handleEmail}
                         />
@@ -106,6 +133,7 @@ export default class LogIn extends Component {
                             secureTextEntry
                             autoCapitalize="none"
                             placeholder="Password"
+                            placeholderTextColor={'grey'}
                             value={this.state.password}
                             onChangeText={this.handlePassword}
                         />
@@ -113,7 +141,7 @@ export default class LogIn extends Component {
                             style={[this.state.styles.loginConfirmButton]}
                             onPress={() => { this.validate() }}>
                             <Text
-                             style={[this.state.styles.loginConfirmButtonText]}
+                                style={[this.state.styles.loginConfirmButtonText]}
                             >
                                 Log in
                             </Text>
